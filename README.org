@@ -1,10 +1,77 @@
 * gro-mode
-Emacs major mode for "freewriting" (after Elbow, 1973).
-
+  An Emacs major mode for "freewriting" (after [[https://en.wikipedia.org/wiki/Peter_Elbow#Writing_Without_Teachers_1973][Elbow, 1973]]).
 ** Background
-Peter Elbow (and others) have suggested a method of "freewriting," eschewing all reflection, revision, and editing. I could find no tool for this style of writing, so I wrote a very simple major mode that binds all the editing commands (that I thought of off the top of my head) to insert an asterisk.
-
+   [[https://en.wikipedia.org/wiki/Peter_Elbow][Peter Elbow]] (and others) established the method of "[[https://en.wikipedia.org/wiki/Freewriting][freewriting]],"
+   producing prose without any reflection, revision, or editing. There
+   was no Emacs tool for this style of writing, so here is a very
+   simple major mode that disables editing keys.
+** Installation
+   Just put the =gro.el= file in a directory in your =load-path=, and
+   =require 'gro= in your Emacs initialization file.
+#+BEGIN_SRC
+(require 'gro)
+#+END_SRC
 ** Usage
-Just =(require 'gro)= in your emacs initialization file.
+   Visiting a file with extension =.gro= will invoke Gro mode. Or, in any
+   buffer, 
+   #+BEGIN_SRC
+   M-x gro-mode
+   #+END_SRC
+** Customization
+   When a disabled key is pressed, there are four ways that Gro mode
+   provides feedback:
+   - inserting a symbol at point (set =gro-feedback-insert-string= to
+     =""= to disable; default is "×")
+   - displaying a reminder in the message box (set
+     =gro-feedback-message-string= to =""= to disable; default is
+     "Growing! Editing keys disabled.")
+   - ringing the bell (set =gro-feedback-bell= to =nil= to disable;
+     non-nil to enable)
+   - flashing the modeline (set =gro-feedback-modeline-flash= to =nil=
+     to disable; non-nil to enable)
 
-Files ending in =.gro= will start in =gro-mode=.
+   Since this stream-of-consciousness method of writing lends itself
+   to journaling, =gro-insert-timestamp= (C-c C-c) will insert a
+   timestamp of format =gro-date-time-format= (default is /e.g./
+   "Tuesday 2020 June 09 13:54").
+   #+BEGIN_SRC
+   C-c C-c gro-insert-timestamp
+   #+END_SRC
+
+   *Note* that keys that move point are disabled! Upon entering Gro
+   mode, point moves to the end of the buffer, so new text is added at
+   the bottom. To disable this behavior, add
+   #+BEGIN_SRC
+   (remove-hook 'gro-mode-hook 'end-of-buffer)
+   #+END_SRC
+   to your init file.
+*** Sample init file
+    #+BEGIN_SRC 
+;;; Disable all feedback
+(setq gro-feedback-insert-string "")
+(setq gro-feedback-message-string "")
+(setq gro-feedback-bell nil)
+(setq gro-feedback-visual-bell nil)
+
+;;; Highly recommend real-auto-save mode
+(add-hook 'gro-mode-hook 'real-auto-save-mode)
+    #+END_SRC
+    Gro mode goes well with [[https://github.com/halueda/real-auto-save][real-auto-save mode]].
+** Miscellaneous
+*** Name
+    Elbow used the metaphors of "growing" writing (including
+    freewriting) followed by "cooking" writing (including conventional
+    reflection and revision). Thus Gro mode is named for "growing"
+    writing, as well as in reverse lexicographical homage to the
+    redoubtable [[https://orgmode.org/][org mode]], an excellent tool for "cooking" writing (in
+    addition to much, much else).
+*** Prior art
+    [[https://writeordie.com/][Write or Die]] is a web app that "motivates" via the risk of
+    punishment, namely the text getting deleted after a time interval
+    without typing.
+
+    Manu Ebert's "[[https://github.com/maebert/themostdangerouswritingapp][The Most Dangerous Writing App]]" is interesting, but
+    also threatens punishment for delays. But it included the useful
+    "hardcore mode," which hides previously-typed text.
+*** Possible future features
+    Possibly add a feature like "hardcore mode?"

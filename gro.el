@@ -51,9 +51,17 @@
 (define-derived-mode gro-mode text-mode "gro"
   "Disallow most editing, except for inserting text.\n
 Force the writer to continue \"freewriting\" without the ability to edit or revise.\n
-Part of Elbow's process of \"growing\" writing.\n"
-  )
+Part of Elbow's process of \"growing\" writing.\n
+\n
+\{gro-mode-map}"
+)
 
+;;; Files named *.gro will open in gro-mode.
 (add-to-list 'auto-mode-alist '("\\.gro\\'" . gro-mode))
+
+;;; Upon starting gro-mode, move point to the end of the buffer.
+;;; E.g. for revisiting a file containing a notebook or journal
+;;; of freewriting. In gro-mode moving point is disabled!
+(add-hook 'gro-mode-hook 'end-of-buffer)
 
 (provide 'gro)

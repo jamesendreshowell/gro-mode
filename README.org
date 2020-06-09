@@ -5,6 +5,6 @@ Emacs major mode for "freewriting" (after Elbow, 1973).
 Peter Elbow (and others) have suggested a method of "freewriting," eschewing all reflection, revision, and editing. I could find no tool for this style of writing, so I wrote a very simple major mode that binds all the editing commands (that I thought of off the top of my head) to insert an asterisk.
 
 ** Usage
-Just @(require 'gro)@ in your emacs initialization file.
+Just =(require 'gro)= in your emacs initialization file.
 
-Files ending in @.gro@ will start in @gro-mode@.
+Files ending in =.gro= will start in =gro-mode=.

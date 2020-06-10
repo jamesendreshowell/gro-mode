@@ -1,5 +1,5 @@
 * gro-mode
-  An Emacs major mode for "freewriting" (after [[https://en.wikipedia.org/wiki/Peter_Elbow#Writing_Without_Teachers_1973][Elbow, 1973]]).
+  An Emacs major mode for *freewriting.* After "growing" writing ([[https://en.wikipedia.org/wiki/Peter_Elbow#Writing_Without_Teachers_1973][Elbow, 1973]]).
 ** Background
    [[https://en.wikipedia.org/wiki/Peter_Elbow][Peter Elbow]] (and others) established the method of "[[https://en.wikipedia.org/wiki/Freewriting][freewriting]],"
    producing prose without any reflection, revision, or editing. There
@@ -21,9 +21,9 @@
    When a disabled key is pressed, there are four ways that Gro mode
    provides feedback:
    - inserting a symbol at point (set =gro-feedback-insert-string= to
-     =""= to disable; default is "×")
+     "" to disable; default is "×")
    - displaying a reminder in the message box (set
-     =gro-feedback-message-string= to =""= to disable; default is
+     =gro-feedback-message-string= to "" to disable; default is
      "Growing! Editing keys disabled.")
    - ringing the bell (set =gro-feedback-bell= to =nil= to disable;
      non-nil to enable)
@@ -66,12 +66,12 @@
     redoubtable [[https://orgmode.org/][org mode]], an excellent tool for "cooking" writing (in
     addition to much, much else).
 *** Prior art
-    [[https://writeordie.com/][Write or Die]] is a web app that "motivates" via the risk of
+    Jeff Printy's [[https://writeordie.com/][Write or Die]] is a web app that "motivates" via the risk of
     punishment, namely the text getting deleted after a time interval
-    without typing.
+    without typing. 
 
-    Manu Ebert's "[[https://github.com/maebert/themostdangerouswritingapp][The Most Dangerous Writing App]]" is interesting, but
-    also threatens punishment for delays. But it included the useful
-    "hardcore mode," which hides previously-typed text.
+    Manu Ebert's "[[https://github.com/maebert/themostdangerouswritingapp][The Most Dangerous Writing App]]" is a standalone app
+    that also threatens punishment for delays. But it includes the
+    useful "hardcore mode," which hides previously-typed text.
 *** Possible future features
     Possibly add a feature like "hardcore mode?"

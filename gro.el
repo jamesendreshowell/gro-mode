@@ -41,17 +41,24 @@
 
 ;;; Code:
 
+
+;;; Provide visual/audible feedback for disabled keys:
+
 (defvar gro-feedback-insert-string "×"
-  "String to insert at point when an inactivated key is pressed.\nSet to \"\" to disable.")
+  "String to insert at point when an inactivated key is pressed.
+Set to \"\" to disable.")
 
 (defvar gro-feedback-message-string "Growing! Editing keys disabled."
-  "String to display in message box when an inactivated key is pressed.\nSet to \"\" to disable.")
+  "String to display in message box when an inactivated key is pressed.
+Set to \"\" to disable.")
 
 (defvar gro-feedback-bell t
-  "non-nil: audible bell as feedback when an inactivated key is pressed.\nSet to nil to disable.")
+  "non-nil: audible bell as feedback when an inactivated key is pressed.
+Set to nil to disable.")
 
-(defvar gro-feedback-visual-bell t
-  "non-nil: flashing modeline as feedback when an inactivated key is pressed.\nSet to nil to disable.")
+(defvar gro-feedback-modeline-flash t
+  "non-nil: flashing modeline as feedback when an inactivated key is pressed.
+Set to nil to disable.")
 
 ;; Stolen from https://www.emacswiki.org/emacs/AlarmBell
 (defun gro-flash-mode-line ()
@@ -59,14 +66,44 @@
   (invert-face 'mode-line)
   (run-with-timer 0.1 nil #'invert-face 'mode-line))
 
-(defun gro-key-disabled-feedback ()
-  "Provide feedback that editing keys are disabled in gro-mode.\nSee: `gro-feedback-bell', `gro-feedback-visual-bell', `gro-feedback-message-string', and `gro-feedback-insert-string'."
+
+;;; Focus: only show a few lines
+
+(defvar gro-focus-lines 3
+  "Number of lines of text to display in the buffer when `gro-focus-switch' is non-nil.")
+
+(defvar gro-focus-switch nil
+  "Set by `gro-focus-toggle'.
+
+non-nil: focus on `gro-focus-lines' lines;
+nil:    focus is inactive")
+
+(defun gro-focus-adjust-buffer ()
+  "Adjust buffer view so that only `gro-focus-lines' of text are visible above point."
+;;; ASSERT: point is at 'end-of-buffer
   (interactive)
-  (if gro-feedback-bell (ding))
-  (if gro-feedback-visual-bell (gro-flash-mode-line))
-  (message gro-feedback-message-string)
-  (insert gro-feedback-insert-string)
+  (recenter-top-bottom (- gro-focus-lines 1))
 )
+
+(defun gro-focus-toggle ()
+  "Activate/inactivate \"focus,\" displaying only `gro-focus-lines' lines of text in the buffer."
+  (interactive)
+  (if (eq gro-focus-switch nil)
+      (progn 
+	(message (concat "Gro focus: displaying last " (number-to-string gro-focus-lines) " lines."))
+	(setq gro-focus-switch t)
+	;; (add-hook HOOK FUNCTION &optional APPEND LOCAL)
+	(add-hook 'post-self-insert-hook 'gro-focus-adjust-buffer nil t) ;; buffer-local
+       )
+    (progn 
+      (message "Gro focus off.")
+      (setq gro-focus-switch nil)
+      ;; (remove-hook HOOK FUNCTION &optional LOCAL)
+      (remove-hook 'post-self-insert-hook 'gro-focus-adjust-buffer t) ;; buffer-local
+      )))
+
+
+;;; Insert timestamp:
 
 (defvar gro-date-time-format
   "%A %Y %B %d %R"
@@ -78,8 +115,24 @@
   (interactive)
   (insert (concat "\n\n" (format-time-string gro-date-time-format (current-time)) "\n")))
 
+
+
+;;; The main function:
+
+(defun gro-key-disabled-feedback ()
+  "Provide feedback that editing keys are disabled in `gro-mode'.
+See: `gro-feedback-bell', `gro-feedback-modeline-flash', `gro-feedback-message-string', and `gro-feedback-insert-string'."
+  (interactive)
+  (if gro-feedback-bell (ding))
+  (if gro-feedback-modeline-flash (gro-flash-mode-line))
+  (message gro-feedback-message-string)
+  (insert gro-feedback-insert-string)
+  (save-excursion (gro-focus-adjust-buffer))
+)
+
+
 ;; Initialize the keymap, then remap editing keys.
-(defvar gro-mode-map nil "Keymap for gro-mode")
+(defvar gro-mode-map nil "Keymap for `gro-mode'.")
 (setq gro-mode-map (make-sparse-keymap))
 
 (define-key gro-mode-map (kbd "M-<") 'gro-key-disabled-feedback)
@@ -157,19 +210,17 @@
 (define-key gro-mode-map (kbd "<M-deletechar>") 'gro-key-disabled-feedback)
 
 
+;;; Shortcut keys:
+(define-key gro-mode-map (kbd "C-c C-f") 'gro-focus-toggle)
 (define-key gro-mode-map (kbd "C-c C-c") 'gro-insert-timestamp)
-;; TODO: gro-toggle-gro-mode, mapped to C-c C-g
-
-
-;;; Other feature ideas:
-;;
-;; TODO: hardcore mode (like in MDWA): only show a few lines
 
 
 (define-derived-mode gro-mode text-mode "gro"
-  "Disallow most editing, except for inserting text.\n
-Force the writer to continue \"freewriting\" without the ability to edit or revise.\n
-Part of Elbow's process of \"growing\" writing.\n")
+  "Disallow most editing, except for inserting text.
+
+Force the writer to continue \"freewriting\" without the ability to edit or revise.
+
+Part of Elbow's process of \"growing\" writing.")
 
 ;;; Files named *.gro will open in gro-mode.
 (add-to-list 'auto-mode-alist '("\\.gro\\'" . gro-mode))

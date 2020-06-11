@@ -17,34 +17,42 @@
    #+BEGIN_SRC
    M-x gro-mode
    #+END_SRC
-** Customization
-   When a disabled key is pressed, there are four ways that Gro mode
-   provides feedback:
-   - inserting a symbol at point (set =gro-feedback-insert-string= to
-     "" to disable; default is "×")
-   - displaying a reminder in the message box (set
-     =gro-feedback-message-string= to "" to disable; default is
-     "Growing! Editing keys disabled.")
-   - ringing the bell (set =gro-feedback-bell= to =nil= to disable;
-     non-nil to enable)
-   - flashing the modeline (set =gro-feedback-modeline-flash= to =nil=
-     to disable; non-nil to enable)
-
-   Since this stream-of-consciousness method of writing lends itself
-   to journaling, =gro-insert-timestamp= (C-c C-c) will insert a
-   timestamp of format =gro-date-time-format= (default is /e.g./
-   "Tuesday 2020 June 09 13:54").
-   #+BEGIN_SRC
+** Features and customization
+*** Providing keystroke feedback
+    When a disabled key is pressed, there are four ways that Gro mode
+    provides feedback:
+    - inserting a symbol at point (set =gro-feedback-insert-string= to
+      "" to disable; default is "×")
+    - displaying a reminder in the message box (set
+      =gro-feedback-message-string= to "" to disable; default is
+      "Growing! Editing keys disabled.")
+    - ringing the bell (set =gro-feedback-bell= to =nil= to disable;
+      non-nil to enable)
+    - flashing the modeline (set =gro-feedback-modeline-flash= to =nil=
+      to disable; non-nil to enable)
+*** Inserting timestamps
+    Since this stream-of-consciousness method of writing lends itself
+    to journaling, =gro-insert-timestamp= (C-c C-c) will insert a
+    timestamp of format =gro-date-time-format= (default is /e.g./
+    "Tuesday 2020 June 09 13:54").
+    #+BEGIN_SRC
    C-c C-c gro-insert-timestamp
-   #+END_SRC
-
-   *Note* that keys that move point are disabled! Upon entering Gro
-   mode, point moves to the end of the buffer, so new text is added at
-   the bottom. To disable this behavior, add
-   #+BEGIN_SRC
+    #+END_SRC
+*** Hiding text ("focus")
+    Sometimes you might want to prevent distraction even from the text
+    that you have just typed. So =gro-focus-toggle= (C-c C-f) will
+    toggle the display of =gro-focus-lines= of text (defalt is 3 lines).
+    #+BEGIN_SRC
+   C-c C-f gro-focus-toggle
+    #+END_SRC
+*** Starting from the end of the buffer
+    *Note* that keys that move point are disabled! Upon entering Gro
+    mode, point moves to the end of the buffer, so new text is added at
+    the bottom. To disable this behavior, add
+    #+BEGIN_SRC
    (remove-hook 'gro-mode-hook 'end-of-buffer)
-   #+END_SRC
-   to your init file.
+    #+END_SRC
+    to your init file.
 *** Sample init file
     #+BEGIN_SRC 
 ;;; Disable all feedback
@@ -52,6 +60,9 @@
 (setq gro-feedback-message-string "")
 (setq gro-feedback-bell nil)
 (setq gro-feedback-visual-bell nil)
+
+;;; Set "focus" to only one line at a time!
+(setq gro-focus-lines 1)
 
 ;;; Highly recommend real-auto-save mode
 (add-hook 'gro-mode-hook 'real-auto-save-mode)
@@ -66,12 +77,58 @@
     redoubtable [[https://orgmode.org/][org mode]], an excellent tool for "cooking" writing (in
     addition to much, much else).
 *** Prior art
-    Jeff Printy's [[https://writeordie.com/][Write or Die]] is a web app that "motivates" via the risk of
-    punishment, namely the text getting deleted after a time interval
-    without typing. 
-
-    Manu Ebert's "[[https://github.com/maebert/themostdangerouswritingapp][The Most Dangerous Writing App]]" is a standalone app
-    that also threatens punishment for delays. But it includes the
-    useful "hardcore mode," which hides previously-typed text.
-*** Possible future features
-    Possibly add a feature like "hardcore mode?"
+    Manu Ebert's [[https://github.com/maebert/themostdangerouswritingapp][The Most Dangerous Writing App]] includes "hardcore
+    mode," which hides previously-typed text. This feature inspired
+    =gro-focus-toggle=.
+*** License
+    [[https://www.gnu.org/licenses/gpl-3.0.en.html][GNU General Public License 3.0]]
+*** Future features                                                                                                          :NOEXPORT:
+**** DONE Focus: only a few lines visible
+     - narrow to current paragraph?
+     - resize buffer to n lines high? "Casio" style "Typewriter" style?
+     - cursor control? =recenter-top-bottom= + =scroll-down-command=?
+       to keep only n lines visible at top of buffer?
+#+BEGIN_SRC 
+(gro-focus-toggle) ;; C-c C-f
+#+END_SRC
+**** Timers! https://www.gnu.org/software/emacs/manual/html_node/elisp/Timers.html timerp
+**** TODO Idle prompts
+#+BEGIN_SRC 
+(setq gro-idle-prompt-interval 10) ;; seconds
+(setq gro-idle-prompt-strings ("Keep writing!" "Don't stop!" (concat "Idle for " gro-idle-prompt-interval " seconds!")))
+#+END_SRC
+**** TODO Inspiration prompts
+     - Quotes from Elbow, Goldberg, Kerouac, etc.
+     - Oblique strategies
+     - etc.
+#+BEGIN_SRC elisp
+(gro-inspire-toggle) ;; C-c C-i
+(setq gro-inspire-interval 
+(setq gro-inspire-quotes (
+      "Zizek: \"Writing disappears.\""
+      "Lamott: \"Shitty first drafts: all good writers write them.\""
+      )
+(add-to-list gro-inspire-quotes "Doctorow: \"Park on a hill.\"")
+#+END_SRC
+**** TODO Time goal
+     - lets you know when m minutes is up
+#+BEGIN_SRC elisp
+(setq gro-goal-time 15)        ;; minutes
+(setq gro-goal-time-reached-message (concat "Well done! " gro-goal-time " minutes completed!"))
+(gro-goal-start-timer) ;; C-c C-t
+(gro-goal-pester t) ;; non-nil gives idle prompts during time and word goals
+#+END_SRC
+**** TODO Word goal
+#+BEGIN_SRC 
+(gro-goal-start-wordcount) ;; C-c C-w
+(setq gro-goal-wordcount 250) ;; words
+(setq gro-goal-wordcount-reached-message (concat "Well done! " gro-goal-wordcount " words completed!"))
+(gro-goal-pester t) ;; non-nil gives idle prompts during time and word goals
+#+END_SRC
+**** TODO Minimal distraction options (cf darkroom?)
+     - fullscreen toggle
+     - modeline toggle
+     - wide margins
+#+BEGIN_SRC 
+(gro-toggle-minimalism)    ; C-c C-m
+#+END_SRC

@@ -14,16 +14,16 @@
 ** Usage
    Visiting a file with extension =.gro= will invoke Gro mode. Or, in any
    buffer, 
-   #+BEGIN_SRC
-   M-x gro-mode
-   #+END_SRC
+#+BEGIN_SRC
+M-x gro-mode
+#+END_SRC
 ** Features and customization
 *** Providing keystroke feedback
     When a disabled key is pressed, there are four ways that Gro mode
     provides feedback:
     - inserting a symbol at point (set =gro-feedback-insert-string= to
       "" to disable; default is "×")
-    - displaying a reminder in the message box (set
+    - displaying a reminder in the echo area (set
       =gro-feedback-message-string= to "" to disable; default is
       "Growing! Editing keys disabled.")
     - ringing the bell (set =gro-feedback-bell= to =nil= to disable;
@@ -33,7 +33,7 @@
 *** Inserting timestamps
     Since this stream-of-consciousness method of writing lends itself
     to journaling, =gro-insert-timestamp= (C-c C-c) will insert a
-    timestamp of format =gro-date-time-format= (default is /e.g./
+    timestamp of format =gro-timestamp-format= (default is /e.g./
     "Tuesday 2020 June 09 13:54").
     #+BEGIN_SRC
    C-c C-c gro-insert-timestamp
@@ -41,28 +41,36 @@
 *** Hiding text ("focus")
     Sometimes you might want to prevent distraction even from the text
     that you have just typed. So =gro-focus-toggle= (C-c C-f) will
-    toggle the display of =gro-focus-lines= of text (defalt is 3 lines).
+    limit the display of =gro-focus-lines-limit= lines of text (defalt
+    is 3 lines). Calling it again shows the buffer filling the entire
+    window.
     #+BEGIN_SRC
    C-c C-f gro-focus-toggle
     #+END_SRC
-*** Starting from the end of the buffer
-    *Note* that keys that move point are disabled! Upon entering Gro
-    mode, point moves to the end of the buffer, so new text is added at
-    the bottom. To disable this behavior, add
+*** Moving to the end of the buffer
+    Keys that move point are disabled! Upon entering Gro mode, point
+    moves to the end of the buffer, so new text is added beneath
+    previous text. To disable this behavior, add
     #+BEGIN_SRC
    (remove-hook 'gro-mode-hook 'end-of-buffer)
     #+END_SRC
-    to your init file.
-*** Sample init file
+    to your init-file.
+** Sample init-file excerpt
     #+BEGIN_SRC 
+(require 'gro)
+
 ;;; Disable all feedback
 (setq gro-feedback-insert-string "")
 (setq gro-feedback-message-string "")
 (setq gro-feedback-bell nil)
 (setq gro-feedback-visual-bell nil)
 
-;;; Set "focus" to only one line at a time!
-(setq gro-focus-lines 1)
+;;; Set focus to only one line at a time!
+;;; Toggle focus with C-c C-f
+(setq gro-focus-lines-limit 1)
+
+;;; Disable default movement to end of buffer
+(remove-hook 'gro-mode-hook 'end-of-buffer)
 
 ;;; Highly recommend real-auto-save mode
 (add-hook 'gro-mode-hook 'real-auto-save-mode)

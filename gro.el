@@ -92,18 +92,17 @@ If gro-focus-switch is nil, this variable gets set to `window-total-height'.")
       (message (concat "Gro: displaying only the last " (number-to-string gro-focus-lines-dynamic-value)
 		       (if (eq gro-focus-lines-dynamic-value 1) " line." " lines."))))))
 
-
 (defun gro-post-self-insert-function ()
   (interactive)
 ;;; ASSERT: point is always at 'end-of-buffer
 ;;; The mode hook puts it there, and movement keys are disabled.
+;;; This isn't really always true, but not a big priority to
+;;; troubleshoot.
   (if (eq (buffer-local-value 'major-mode (current-buffer)) 'gro-mode)
       (progn
 	(recenter-top-bottom (- gro-focus-lines-dynamic-value 1)))))
 
-;; Call gro-post-self-insert-function after every self-insertion.
 (add-hook 'post-self-insert-hook 'gro-post-self-insert-function)
-
 
 
 ;;; Timestamp
@@ -128,6 +127,13 @@ If gro-focus-switch is nil, this variable gets set to `window-total-height'.")
   "Provide feedback that editing keys are disabled in `gro-mode'.
 See: `gro-feedback-bell', `gro-feedback-modeline-flash', `gro-feedback-message-string', and `gro-feedback-insert-string'."
   (interactive)
+
+  ;; Check to see if gro-enable-backspace has changed to t
+  ;; and remap <backspace> if it has. There must be a more
+  ;; elegant way to do this? Implemented this way, the first
+  ;; backspace changes the mapping 
+  (if gro-enable-backspace
+      (define-key gro-mode-map (kbd "<backspace>") 'backward-delete-char-untabify))
   (if gro-feedback-bell (ding))
   (if gro-feedback-modeline-flash (gro-flash-mode-line))
   (message gro-feedback-message-string)
@@ -138,10 +144,31 @@ See: `gro-feedback-bell', `gro-feedback-modeline-flash', `gro-feedback-message-s
 (defvar gro-mode-map nil "Keymap for `gro-mode'.")
 (setq gro-mode-map (make-sparse-keymap))
 
+(defvar gro-enable-backspace nil
+  ;; KNOWN ISSUE: it would be more elegant with defcustom.
+  ;; KNOWN ISSUE: it would be more elegant with a toggle function.
+  "nil:     <backspace> maps to `gro-key-disabled-feedback';
+non-nil: <backspace> maps to `backward-delete-char-untabify'.")
 
 ;; I presume that there is a simple way to loop over this list of keys
 ;; and assign them all to the same function, but I'm just learning
 ;; emacs lisp and I might change it later.
+;; -----------------------
+;; Inactivate editing keys
+(define-key gro-mode-map (kbd "<backspace>") 'gro-key-disabled-feedback)
+
+(define-key gro-mode-map (kbd "<deletechar>") 'gro-key-disabled-feedback)
+(define-key gro-mode-map (kbd "<M-backspace>") 'gro-key-disabled-feedback)
+(define-key gro-mode-map (kbd "<M-deletechar>") 'gro-key-disabled-feedback)
+(define-key gro-mode-map (kbd "<deleteline>") 'gro-key-disabled-feedback)
+(define-key gro-mode-map (kbd "<insertline>") 'gro-key-disabled-feedback)
+(define-key gro-mode-map (kbd "C-k") 'gro-key-disabled-feedback)
+(define-key gro-mode-map (kbd "C-S-k") 'gro-key-disabled-feedback)
+(define-key gro-mode-map (kbd "C-o") 'gro-key-disabled-feedback)
+(define-key gro-mode-map (kbd "C-S-o") 'gro-key-disabled-feedback)
+
+(define-key gro-mode-map (kbd "<M-insert>") 'gro-key-disabled-feedback)
+(define-key gro-mode-map (kbd "<M-delete>") 'gro-key-disabled-feedback)
 
 ;; Inactivate keys that move point
 (define-key gro-mode-map (kbd "M-<") 'gro-key-disabled-feedback)
@@ -210,33 +237,18 @@ See: `gro-feedback-bell', `gro-feedback-modeline-flash', `gro-feedback-message-s
 ;; <http://www.masteringemacs.org/article/mastering-key-bindings-emacs>
 (define-key gro-mode-map [remap recenter-top-bottom] 'gro-key-disabled-feedback)
 
-;; Inactivate editing keys
-(define-key gro-mode-map (kbd "<backspace>") 'gro-key-disabled-feedback)
-(define-key gro-mode-map (kbd "<deletechar>") 'gro-key-disabled-feedback)
-(define-key gro-mode-map (kbd "<M-backspace>") 'gro-key-disabled-feedback)
-(define-key gro-mode-map (kbd "<M-deletechar>") 'gro-key-disabled-feedback)
-(define-key gro-mode-map (kbd "<deleteline>") 'gro-key-disabled-feedback)
-(define-key gro-mode-map (kbd "<insertline>") 'gro-key-disabled-feedback)
-(define-key gro-mode-map (kbd "C-k") 'gro-key-disabled-feedback)
-(define-key gro-mode-map (kbd "C-S-k") 'gro-key-disabled-feedback)
-(define-key gro-mode-map (kbd "C-o") 'gro-key-disabled-feedback)
-(define-key gro-mode-map (kbd "C-S-o") 'gro-key-disabled-feedback)
-
-(define-key gro-mode-map (kbd "<M-insert>") 'gro-key-disabled-feedback)
-(define-key gro-mode-map (kbd "<M-delete>") 'gro-key-disabled-feedback)
-
 ;; Shortcut keys:
 (define-key gro-mode-map (kbd "C-c C-f") 'gro-focus-toggle)
 (define-key gro-mode-map (kbd "C-c C-c") 'gro-timestamp-insert)
 
 
+;;; Global configuration
 
 ;; Upon starting gro-mode, move point to the end of the buffer.
 (add-hook 'gro-mode-hook 'end-of-buffer)
 
 ;; Files named *.gro open in gro-mode.
 (add-to-list 'auto-mode-alist '("\\.gro\\'" . gro-mode))
-
 
 
 (define-derived-mode gro-mode text-mode "gro"
@@ -246,6 +258,5 @@ Part of Elbow's process of \"growing\" writing.")
 
 
 (provide 'gro)
-
 
 ;;; gro.el ends here

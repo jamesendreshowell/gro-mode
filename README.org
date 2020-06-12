@@ -55,6 +55,13 @@ M-x gro-mode
    (remove-hook 'gro-mode-hook 'end-of-buffer)
     #+END_SRC
     to your init-file.
+*** Enabling backspace
+    You may want to keep =<backspace>= enabled, depending on your
+    typing accuracy or on the intended use of the text you produce
+    with Gro mode.
+    #+BEGIN_SRC
+    (setq gro-enable-backspace t)
+    #+END_SRC
 ** Sample init-file excerpt
     #+BEGIN_SRC 
 (require 'gro)
@@ -68,6 +75,9 @@ M-x gro-mode
 ;;; Set focus to only one line at a time!
 ;;; Toggle focus with C-c C-f
 (setq gro-focus-lines-limit 1)
+
+;;; Keep <backspace> enabled
+(setq gro-enable-backspace t)
 
 ;;; Disable default movement to end of buffer
 (remove-hook 'gro-mode-hook 'end-of-buffer)

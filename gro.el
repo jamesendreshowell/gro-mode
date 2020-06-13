@@ -94,7 +94,7 @@ If gro-focus-switch is nil, this variable gets set to `window-total-height'.")
 
 (defun gro-post-self-insert-function ()
   (interactive)
-;;; ASSERT: point is always at 'end-of-buffer
+;;; ASSERT: point is always at end-of-buffer
 ;;; The mode hook puts it there, and movement keys are disabled.
 ;;; This isn't really always true, but not a big priority to
 ;;; troubleshoot.
@@ -245,7 +245,8 @@ non-nil: <backspace> maps to `backward-delete-char-untabify'.")
 ;;; Global configuration
 
 ;; Upon starting gro-mode, move point to the end of the buffer.
-(add-hook 'gro-mode-hook 'end-of-buffer)
+;; (add-hook 'gro-mode-hook 'end-of-buffer) Docs say only use 'end-of-buffer interactively.
+(add-hook 'gro-mode-hook (lambda () (goto-char (point-max))))
 
 ;; Files named *.gro open in gro-mode.
 (add-to-list 'auto-mode-alist '("\\.gro\\'" . gro-mode))

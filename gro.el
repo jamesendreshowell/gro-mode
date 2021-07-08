@@ -103,7 +103,8 @@ Set by `gro-focus-toggle'.")
 ;;; troubleshoot.
   (if (eq (buffer-local-value 'major-mode (current-buffer)) 'gro-mode)
       (progn
-	(recenter-top-bottom (- gro-focus-lines-dynamic-value 1)))))
+	(recenter-top-bottom (- gro-focus-lines-dynamic-value 1))
+	(message ""))))
 
 (add-hook 'post-self-insert-hook 'gro-post-self-insert-function)
 

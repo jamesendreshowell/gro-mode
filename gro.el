@@ -70,8 +70,11 @@
 If gro-focus-switch is t,   this variable gets set to `gro-focus-lines-limit' (or 1, whichever is higher).
 If gro-focus-switch is nil, this variable gets set to `window-total-height'.")
 
-(defvar gro-focus-switch nil
-  "Set by `gro-focus-toggle'.")
+(defvar gro-focus-switch t
+  "t    focus on `gro-focus-lines-limit' lines
+nil show all lines
+
+Set by `gro-focus-toggle'.")
 
 (defun gro-focus-toggle ()
   "Switch between displaying `gro-focus-lines-limit' and `window-total-height' lines of text in the buffer."
@@ -240,7 +243,6 @@ non-nil: <backspace> maps to `backward-delete-char-untabify'.")
 ;; Shortcut keys:
 (define-key gro-mode-map (kbd "C-c C-f") 'gro-focus-toggle)
 (define-key gro-mode-map (kbd "C-c C-c") 'gro-timestamp-insert)
-
 
 ;;; Global configuration
 

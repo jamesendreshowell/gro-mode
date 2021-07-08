@@ -117,7 +117,7 @@ Set by `gro-focus-toggle'.")
 (defun gro-timestamp-insert ()
   "Insert timestamp of the format `gro-date-time-format', e.g. for a running journal file."
   (interactive)
-  (insert (concat "\n\n" (format-time-string gro-timestamp-format (current-time)) "\n"))
+  (insert (concat (format-time-string gro-timestamp-format (current-time)) "\n"))
   (gro-post-self-insert-function))
 
 
